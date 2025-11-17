@@ -89,18 +89,21 @@ class Enemy {
         if (type === 1) {
             this.speed = 3 + Math.random() * 2;
             this.health = 50;
+            this.award = 10;
         } else if (type === 2) {
             this.speed = 2 + Math.random() * 1.5;
             this.health = 90;
+            this.award = 30;
         } else if (type === 3) {
             this.speed = 4 + Math.random() * 2.5;
             this.health = 40;
+            this.award = 20;
         }
         this.maxHealth = this.health;
     }
 
     draw() {
-        // Draw correct image based on type
+        // Draw correct image based on type of enemy
         let img = this.type === 1 ? fishMonster :
                   this.type === 2 ? snakeMonster :
                   lizardMonster;
@@ -143,11 +146,32 @@ class Bullet {
 
 // GAME STATE
 const player = new Player();
-let bullets = [];
+let bulletPool = [];
+let activeBullets = [];
 let enemies = [];
 let keys = {};
 let score = 0;
 let gameOver = false;
+
+// Preallocate 20 bullets for pool
+for (let i = 0; i < 20; i++) {
+    bulletPool.push(new Bullet(0, 0));
+}
+
+
+//BULLET POOL IMPLEMENTATION
+
+function getBullet() {
+    if (bulletPool.length > 0) {
+        return bulletPool.shift();
+    }
+    return new Bullet(0, 0);
+}
+
+function recycleBullet(bullet) {
+    bulletPool.push(bullet);
+}
+
 
 // INPUT
 document.addEventListener("keydown", e => keys[e.code] = true);
@@ -159,9 +183,15 @@ document.getElementById("restartBtn").addEventListener("click", () => {
     window.location.reload();
 });
 
-// SHOOT
+// SHOOT (uses bullet pool)
 function shoot() {
-    if (!gameOver) bullets.push(new Bullet(player.x + player.width, player.y + player.height / 2 - 3));
+    if (gameOver) return;
+
+    const bullet = getBullet();
+    bullet.x = player.x + player.width;
+    bullet.y = player.y + player.height / 2 - 3;
+
+    activeBullets.push(bullet);
 }
 
 // ENEMY SPAWN
@@ -179,23 +209,41 @@ function update() {
 
     player.move(keys);
 
-    bullets.forEach((b, i) => {
-        b.update();
-        if (b.x > canvas.width) bullets.splice(i, 1);
-    });
+    // BULLET UPDATE AND REMOVAL 
+    let bulletsToRemove = [];
 
-    enemies.forEach((e, ei) => {
+    for (let i = 0; i < activeBullets.length; i++) {
+        const b = activeBullets[i];
+        b.update();
+
+        if (b.x > canvas.width) {
+            bulletsToRemove.push(i);
+        }
+    }
+
+    // ENEMY UPDATE AND REMOVAL
+    let enemiesToRemove = [];
+
+    for (let ei = 0; ei < enemies.length; ei++) {
+        const e = enemies[ei];
         e.move();
 
         // Enemy hits player
-        if (e.x < player.x + player.width &&
+        if (
+            e.x < player.x + player.width &&
             e.x + e.width > player.x &&
             e.y < player.y + player.height &&
-            e.y + e.height > player.y) {
+            e.y + e.height > player.y
+        ) {
             player.health -= 0.5;
         }
 
-        bullets.forEach((b, bi) => {
+        // BULLET COLLISIONS
+        for (let bi = 0; bi < activeBullets.length; bi++) {
+            const b = activeBullets[bi];
+
+            if (Math.abs(b.x - e.x) > 120) continue;
+
             if (
                 b.x < e.x + e.width &&
                 b.x + b.width > e.x &&
@@ -203,16 +251,30 @@ function update() {
                 b.y + b.height > e.y
             ) {
                 e.health -= 25;
-                bullets.splice(bi, 1);
+                bulletsToRemove.push(bi);
             }
-        });
+        }
 
         if (e.health <= 0) {
-            enemies.splice(ei, 1);
-            score += 10;
+            enemiesToRemove.push(ei);
+            score += e.award;
         }
+    }
+
+    // REMOVE BULLETS
+    bulletsToRemove = [...new Set(bulletsToRemove)];
+    bulletsToRemove.sort((a, b) => b - a);
+    bulletsToRemove.forEach(i => {
+        const removed = activeBullets.splice(i, 1)[0];
+        recycleBullet(removed);
     });
 
+    // REMOVE ENEMIES
+    enemiesToRemove = [...new Set(enemiesToRemove)];
+    enemiesToRemove.sort((a, b) => b - a);
+    enemiesToRemove.forEach(i => enemies.splice(i, 1));
+
+    // UI
     document.getElementById("score").innerText = score;
     document.getElementById("playerHealth").innerText = Math.max(0, Math.floor(player.health));
 
@@ -221,16 +283,17 @@ function update() {
     }
 }
 
+
 // DRAW GAME
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
     ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
 
     player.draw();
-    bullets.forEach(b => b.draw());
+    activeBullets.forEach(b => b.draw());
     enemies.forEach(e => e.draw());
 }
+
 
 // GAME LOOP
 function gameLoop() {
@@ -238,6 +301,7 @@ function gameLoop() {
     draw();
     if (!gameOver) requestAnimationFrame(gameLoop);
 }
+
 
 function endGame() {
     gameOver = true;
