@@ -1,7 +1,6 @@
 # Canvas Shooter Game
 
-A simple 2D shooter game built using the HTML5 Canvas API. The player controls a character, shoots enemies, and tracks score and health. The project demonstrates fundamental game development concepts in JavaScript, including data structures, algorithms, and asynchronous asset loading.
-
+A simple 2D shooter game built using the HTML5 Canvas API. The player controls a character, shoots enemies, and tracks score and health. 
 ---
 
 ## Table of Contents
@@ -54,18 +53,6 @@ A simple 2D shooter game built using the HTML5 Canvas API. The player controls a
 5. Defeat enemies to earn points.
 6. Game ends when player health reaches zero.
 7. Click **Restart** to play again.
-
----
-
-## Learning Outcomes Demonstrated
-
-- **Canvas API:** All 2D rendering and animation uses Canvas.
-- **Data Structures:** Arrays and classes used for bullets, enemies, and game state.
-- **Algorithms:** Collision detection, enemy movement, and health calculations.
-- **Structuring Code:** Classes and functions organize the code for maintainability.
-- **Git Version Control:** Track changes and maintain commit history.
-- **Game Design Documentation:** Project includes a Game Design Document (GDD).
-- **Debugging & Testing:** Comments and logging demonstrate debugging techniques.
 
 ---
 
