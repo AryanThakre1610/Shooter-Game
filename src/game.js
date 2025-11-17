@@ -1,4 +1,4 @@
-let playerImg, enemyImg, bgImg;
+let playerImg, fishMonster, snakeMonster, lizardMonster, bgImg;
 let shootSound, bgMusic;
 
 const canvas = document.getElementById("gameCanvas");
@@ -22,12 +22,14 @@ async function loadAssets() {
     const [images] = await Promise.all([
         Promise.all([
             loadImage("../assets/img/player.png"),
-            loadImage("../assets/img/enemy.png"),
+            loadImage("../assets/img/fishMonster.png"),
+            loadImage("../assets/img/snakeMonster.png"),
+            loadImage("../assets/img/lizardMonster.png"),
             loadImage("../assets/img/background.png")
         ])
     ]);
 
-    [playerImg, enemyImg, bgImg] = images;
+    [playerImg, fishMonster, snakeMonster, lizardMonster, bgImg] = images;
 }
 
 function loadingLoop() {
@@ -37,7 +39,7 @@ function loadingLoop() {
     ctx.fillText("Loading...", 300 + Math.sin(Date.now()/200) * 20, 250);
 
     // Start game if all assets loaded
-    if (playerImg && enemyImg && bgImg) {
+    if (playerImg && fishMonster && snakeMonster && lizardMonster && bgImg) {
         gameLoop();
     } else {
         requestAnimationFrame(loadingLoop);
@@ -76,18 +78,36 @@ class Player {
 
 // ENEMY CLASS
 class Enemy {
-    constructor() {
+    constructor(type = 1) {
+        this.type = type; // 1, 2, 3
         this.width = 80;
         this.height = 120;
         this.x = canvas.width + 50;
         this.y = Math.random() * (canvas.height - this.height);
-        this.speed = 3 + Math.random() * 2;
-        this.health = 50;
-        this.maxHealth = 50;
+
+        // Different speed/health per enemy type
+        if (type === 1) {
+            this.speed = 3 + Math.random() * 2;
+            this.health = 50;
+        } else if (type === 2) {
+            this.speed = 2 + Math.random() * 1.5;
+            this.health = 90;
+        } else if (type === 3) {
+            this.speed = 4 + Math.random() * 2.5;
+            this.health = 40;
+        }
+        this.maxHealth = this.health;
     }
 
     draw() {
-        ctx.drawImage(enemyImg, this.x, this.y, this.width, this.height);
+        // Draw correct image based on type
+        let img = this.type === 1 ? fishMonster :
+                  this.type === 2 ? snakeMonster :
+                  lizardMonster;
+
+        ctx.drawImage(img, this.x, this.y, this.width, this.height);
+
+        // Health bar
         ctx.strokeStyle = "red";
         ctx.lineWidth = 2;
         ctx.strokeRect(this.x, this.y - 12, this.width, 6);
@@ -98,8 +118,8 @@ class Enemy {
     move() {
         this.x -= this.speed;
     }
-
 }
+
 
 // BULLET CLASS
 class Bullet {
@@ -146,7 +166,10 @@ function shoot() {
 
 // ENEMY SPAWN
 function spawnEnemy() {
-    if (!gameOver) enemies.push(new Enemy());
+    if (!gameOver) {
+        const type = Math.floor(Math.random() * 3) + 1; // 1, 2, or 3
+        enemies.push(new Enemy(type));
+    }
 }
 setInterval(spawnEnemy, 1200);
 
