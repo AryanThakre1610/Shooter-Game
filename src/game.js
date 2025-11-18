@@ -158,9 +158,18 @@ for (let i = 0; i < 20; i++) {
     bulletPool.push(new Bullet(0, 0));
 }
 
+// INPUT
+document.addEventListener("keydown", e => keys[e.code] = true);
+document.addEventListener("keyup", e => keys[e.code] = false);
+document.addEventListener("mousedown", () => shoot());
+
+// Restart button
+document.getElementById("restartBtn").addEventListener("click", () => {
+    window.location.reload();
+});
+
 
 //BULLET POOL IMPLEMENTATION
-
 function getBullet() {
     if (bulletPool.length > 0) {
         return bulletPool.shift();
@@ -172,16 +181,31 @@ function recycleBullet(bullet) {
     bulletPool.push(bullet);
 }
 
+// REMOVE ENEMY
+function removeEnemy(i) {
+    const last = enemies.length - 1;
+    [enemies[i], enemies[last]] = [enemies[last], enemies[i]];
+    enemies.pop();
+}
 
-// INPUT
-document.addEventListener("keydown", e => keys[e.code] = true);
-document.addEventListener("keyup", e => keys[e.code] = false);
-document.addEventListener("mousedown", () => shoot());
+// REMOVE BULLET
+function removeBullet(i) {
+    const last = activeBullets.length - 1;
+    [activeBullets[i], activeBullets[last]] =
+      [activeBullets[last], activeBullets[i]];
+    const bullet = activeBullets.pop();
+    recycleBullet(bullet);
+}
 
-// Restart button
-document.getElementById("restartBtn").addEventListener("click", () => {
-    window.location.reload();
-});
+// ENEMY SPAWN
+function spawnEnemy() {
+    if (!gameOver) {
+        const type = Math.floor(Math.random() * 3) + 1; // 1, 2, or 3
+        enemies.push(new Enemy(type));
+    }
+}
+setInterval(spawnEnemy, 1200);
+
 
 // SHOOT (uses bullet pool)
 function shoot() {
@@ -194,15 +218,6 @@ function shoot() {
     activeBullets.push(bullet);
 }
 
-// ENEMY SPAWN
-function spawnEnemy() {
-    if (!gameOver) {
-        const type = Math.floor(Math.random() * 3) + 1; // 1, 2, or 3
-        enemies.push(new Enemy(type));
-    }
-}
-setInterval(spawnEnemy, 1200);
-
 // UPDATE GAME
 function update() {
     if (gameOver) return;
@@ -210,19 +225,14 @@ function update() {
     player.move(keys);
 
     // BULLET UPDATE AND REMOVAL 
-    let bulletsToRemove = [];
-
     for (let i = 0; i < activeBullets.length; i++) {
         const b = activeBullets[i];
         b.update();
 
         if (b.x > canvas.width) {
-            bulletsToRemove.push(i);
+            removeBullet(i);
         }
     }
-
-    // ENEMY UPDATE AND REMOVAL
-    let enemiesToRemove = [];
 
     for (let ei = 0; ei < enemies.length; ei++) {
         const e = enemies[ei];
@@ -242,7 +252,7 @@ function update() {
         for (let bi = 0; bi < activeBullets.length; bi++) {
             const b = activeBullets[bi];
 
-            if (Math.abs(b.x - e.x) > 120) continue;
+            if (Math.abs(b.x - e.x) > 120) continue; // SKIP FAR AWAY BULLETS
 
             if (
                 b.x < e.x + e.width &&
@@ -251,28 +261,18 @@ function update() {
                 b.y + b.height > e.y
             ) {
                 e.health -= 25;
-                bulletsToRemove.push(bi);
+                removeBullet(bi);
+            }
+        
+            if (e.health <= 0) {
+                removeEnemy(ei)
+                score += e.award;
+                break
             }
         }
 
-        if (e.health <= 0) {
-            enemiesToRemove.push(ei);
-            score += e.award;
-        }
+        
     }
-
-    // REMOVE BULLETS
-    bulletsToRemove = [...new Set(bulletsToRemove)];
-    bulletsToRemove.sort((a, b) => b - a);
-    bulletsToRemove.forEach(i => {
-        const removed = activeBullets.splice(i, 1)[0];
-        recycleBullet(removed);
-    });
-
-    // REMOVE ENEMIES
-    enemiesToRemove = [...new Set(enemiesToRemove)];
-    enemiesToRemove.sort((a, b) => b - a);
-    enemiesToRemove.forEach(i => enemies.splice(i, 1));
 
     // UI
     document.getElementById("score").innerText = score;
