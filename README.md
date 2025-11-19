@@ -17,9 +17,9 @@ A 2D shooter game built with HTML5 Canvas. Control your hero, defeat waves of en
 
 ## Demo
 
-![alt text](image.png)
+![alt text](demo1.png)
 
-![alt text](image-1.png)
+![alt text](demo2.png)
 
 ---
 
