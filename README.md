@@ -1,67 +1,98 @@
-# Alien-Shooter Game
+# Shooter Game
 
-A simple 2D shooter game built using the HTML5 Canvas API. The player controls a character, shoots enemies, and tracks score and health. 
+A 2D shooter game built with HTML5 Canvas. Control your hero, defeat waves of enemies, collect power-ups, and face a final boss!
+
 ---
 
 ## Table of Contents
-
-- [Demo](#demo)  
-- [Features](#features)  
-- [Technologies Used](#technologies-used)  
-- [Gameplay Instructions](#gameplay-instructions)  
-- [Learning Outcomes](#learning-outcomes)  
-- [Setup](#setup)  
-- [Credits](#credits)  
+- [Demo](#demo)
+- [Features](#features)
+- [Technologies Used](#technologies-used)
+- [Gameplay Instructions](#gameplay-instructions)
+- [Setup & Testing](#setup--testing)
+- [Learning Outcomes](#learning-outcomes)
+- [Credits](#credits)
 
 ---
 
 ## Demo
 
-<img width="2184" height="1282" alt="image" src="https://github.com/user-attachments/assets/85da5e52-b68c-4b4b-ac4c-bbcb43ce1481" />
+![alt text](image.png)
+
+![alt text](image-1.png)
 
 ---
 
 ## Features
-
-- **Player Movement:** Move with WASD keys.
-- **Shooting:** Click or press Space to shoot bullets.
-- **Enemies:** Spawn from the right and move left.
-- **Health System:** Player and enemies have health bars.
-- **Score Tracking:** Score increases when enemies are defeated.
-- **Game Over Screen:** Appears when player health reaches zero.
-- **Asset Loading:** Images loaded asynchronously before game start.
-- **Responsive Canvas:** Game runs in 900x500 pixel canvas.
+- **Player Movement:** Move with WASD keys
+- **Shooting:** Click left mouse button
+- **Enemies:** Multiple types, spawn from portals, unique movement
+- **Boss Fight:** Challenging final boss with special attacks
+- **Collectables:** 
+    - <img src="assets/img/collectables/health.png" alt="Health" width="28" height="28"/> Health 
+    - <img src="assets/img/collectables/score.png" alt="Score" width="28" height="28"/> Score 
+    - <img src="assets/img/collectables/speed.png" alt="Speed" width="28" height="28"/> Speed 
+    - <img src="assets/img/collectables/berserk.png" alt="Berserk" width="28" height="28"/> Berserk 
+    - <img src="assets/img/collectables/ignite.png" alt="Ignite" width="28" height="28"/> Ignite 
+    - <img src="assets/img/collectables/slowdown.png" alt="Slowdown" width="28" height="28"/> Slowdown
+- **Health & Score System:** Track your progress and survival
+- **Game Over & Victory Screens:** Clear feedback for win/loss
+- **Responsive Canvas:** Adapts to window size
+- **Asset Preloading:** Smooth experience with loading screen
 
 ---
 
 ## Technologies Used
-
 - HTML5
 - CSS3
 - JavaScript (ES6+)
 - Canvas API
-
+- Jest (for unit testing)
 
 ---
 
 ## Gameplay Instructions
-
 1. Open `index.html` in a modern browser.
 2. Use **WASD** to move the player.
-3. Press **Space** or **Left Click** to shoot bullets.
+3. Click to shoot.
 4. Avoid enemy contact; player health decreases on collision.
-5. Defeat enemies to earn points.
-6. Game ends when player health reaches zero.
-7. Click **Restart** to play again.
+5. Defeat enemies and portals to earn points.
+6. Collect power-ups for bonuses.
+7. Defeat the boss to win!
+8. Click **Restart** to play again.
 
 ---
 
-## Setup
+## Setup & Testing
 
-1. Clone the repository:
+1. **Clone the repository:**
+   ```bash
+   git clone <your-repo-url>
+   cd Shooter-Game
+   ```
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+3. **Run the game:**
+   - Open `src/index.html` in your browser.
+4. **Run tests:**
+   ```bash
+   npm test
+   ```
+   All core game logic is covered by Jest unit tests in `src/game.test.js`.
 
-```bash
-git clone https://github.com/yourusername/canvas-shooter.git
+---
 
+## Learning Outcomes
+- Mastery of Canvas API for 2D games
+- Game architecture: classes, state, and event handling
+- Asset management and responsive design
+- Writing and running unit tests for JavaScript
+
+---
+
+
+Enjoy the gameplay :)
 
 

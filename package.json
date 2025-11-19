@@ -1,0 +1,15 @@
+{
+  "name": "shooter-game",
+  "version": "1.0.0",
+  "description": "A simple shooter game with collectables and boss mechanics.",
+  "main": "src/game.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": ["game", "shooter", "javascript"],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^29.0.0"
+  }
+}
