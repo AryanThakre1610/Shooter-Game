@@ -1,16 +1,20 @@
 let playerImg, fishMonster, snakeMonster, lizardMonster, bgImg, portalImg, bossImg, healthImg, berserkImg, scoreImg, speedImg, igniteImg, slowdownImg;
 let shootSound, bgMusic;
 
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
+// Only define canvas and context if running in a browser
+let canvas, ctx;
+if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+    canvas = document.getElementById("gameCanvas");
+    ctx = canvas.getContext("2d");
 
-function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
 }
-
-resizeCanvas();
-window.addEventListener("resize", resizeCanvas);
 
 // =======================
 // ASSET LOADING
@@ -84,14 +88,17 @@ function endGame(isVictory = false) {
 // =======================
 class Player {
     constructor() {
+        // Provide fallback for test environment
+        const defaultHeight = 600;
         this.x = 40;
-        this.y = canvas.height / 2 - 60;
+        this.y = (typeof canvas !== 'undefined' && canvas && canvas.height ? canvas.height : defaultHeight) / 2 - 60;
         this.width = 80;
         this.height = 120;
         this.speed = 5;
         this.health = 100;
         this.maxHealth = 100;
         this.facing = "right";
+        this.damage = 1; // Normal mode damage
     }
 
     draw() {
@@ -147,11 +154,14 @@ class Player {
 // =======================
 class Enemy {
     constructor(type = 1) {
+        // Provide fallback for test environment
+        const defaultWidth = 800;
+        const defaultHeight = 600;
         this.type = type;
         this.width = 80;
         this.height = 120;
-        this.x = canvas.width + 50;
-        this.y = Math.random() * (canvas.height - this.height);
+        this.x = (typeof canvas !== 'undefined' && canvas && canvas.width ? canvas.width : defaultWidth) + 50;
+        this.y = Math.random() * ((typeof canvas !== 'undefined' && canvas && canvas.height ? canvas.height : defaultHeight) - this.height);
 
         if (type === 1) { this.baseSpeed = 4; this.health = 50; this.award = 10; }
         else if (type === 2) { this.baseSpeed = 2; this.health = 90; this.award = 30; }
@@ -211,6 +221,7 @@ class Bullet {
         this.speed = 9;
         this.active = false;
         this.direction = "right";
+        this.damage = 25;
     }
 
     activate(x, y, direction = "right") {
@@ -239,17 +250,23 @@ class Bullet {
 // PORTAL CLASS
 // =======================
 class Portal {
-    constructor(type = 1, index = 0, totalPortals = 3) {
+    constructor(type = 1, index = 0, totalPortals = 3, enemiesArray = null) {
+        // Provide fallback for test environment
+        const defaultWidth = 800;
+        const defaultHeight = 600;
         this.type = type; // portal image type
         this.width = 100;
         this.height = 100;
-        this.x = Math.min(Math.max(900, canvas.width * 0.6 + Math.random() * (canvas.width * 0.4 - this.width)), canvas.width - this.width);
-        const availableHeight = canvas.height - (this.height * totalPortals);
+        const cWidth = (typeof canvas !== 'undefined' && canvas && canvas.width ? canvas.width : defaultWidth);
+        const cHeight = (typeof canvas !== 'undefined' && canvas && canvas.height ? canvas.height : defaultHeight);
+        this.x = Math.min(Math.max(900, cWidth * 0.6 + Math.random() * (cWidth * 0.4 - this.width)), cWidth - this.width);
+        const availableHeight = cHeight - (this.height * totalPortals);
         const gap = availableHeight / (totalPortals + 1);
         this.y = gap + index * (this.height + gap);        
         this.health = 150;
         this.maxHealth = this.health;
         this.spawnTimer = Math.floor(Math.random() * 180);    
+        this._enemies = enemiesArray || (typeof enemies !== 'undefined' ? enemies : []);
     }
 
     draw() {
@@ -274,7 +291,7 @@ class Portal {
         const enemy = new Enemy(type);
         enemy.x = this.x + this.width/2 - enemy.width/2;
         enemy.y = this.y + this.height/2 - enemy.height/2;
-        enemies.push(enemy);
+        this._enemies.push(enemy);
     }
 }
 
@@ -283,13 +300,18 @@ class Portal {
 // =======================
 class Boss {
     constructor() {
+        // Provide fallback for test environment
+        const defaultWidth = 800;
+        const defaultHeight = 600;
         this.width = 200;
         this.height = 200;
-        this.x = canvas.width - this.width - 50;
-        this.y = canvas.height / 2 - this.height / 2;
+        const cWidth = (typeof canvas !== 'undefined' && canvas && canvas.width ? canvas.width : defaultWidth);
+        const cHeight = (typeof canvas !== 'undefined' && canvas && canvas.height ? canvas.height : defaultHeight);
+        this.x = cWidth - this.width - 50;
+        this.y = cHeight / 2 - this.height / 2;
 
-        this.health = 1000;
-        this.maxHealth = 1000;
+        this.health = 1200;
+        this.maxHealth = 1200;
 
         this.moveTimer = 0;
         this.targetY = this.y;
@@ -450,7 +472,7 @@ class Collectable {
         let img;
         switch (this.type) {
             case "health": img = healthImg; break;
-            case "ammo": img = berserkImg; break;
+            case "berserk": img = berserkImg; break;
             case "score": img = scoreImg; break;
             case "speed": img = speedImg; break;
             case "ignite": img = igniteImg; break;
@@ -486,8 +508,10 @@ class Collectable {
             case "health":
                 player.health = Math.min(player.maxHealth, player.health + 30);
                 break;
-            case "ammo":
-                // optional: give extra bullets or fire rate
+            case "berserk":
+                player.damage = 2; // double damage
+                player.health -= 5; // slight health cost
+                setTimeout(() => player.damage = 1, 10000); // lasts 10 seconds
                 break;
             case "score":
                 score += 50; 
@@ -502,14 +526,12 @@ class Collectable {
                 }
                 break;
             case "slowdown":
-                speedMultiplier = 0.5
+                speedMultiplier = 0.5;
                 setTimeout(() => {
-                    // for (let e of enemies) 
-                    speedMultiplier = 1; // restore speed
-                }, 5000); // effect lasts 5 seconds
+                    speedMultiplier = 1;
+                }, 5000);
                 break;
         }
-
         this.active = false;
     }
 }
@@ -549,11 +571,16 @@ for (let i = 0; i < MAX_BOSS_BULLETS; i++) {
 const MAX_BULLETS = 30;
 for (let i=0; i<MAX_BULLETS; i++) bulletPool.push(new Bullet());
 
-// Input
-document.addEventListener("keydown", e => keys[e.code] = true);
-document.addEventListener("keyup", e => keys[e.code] = false);
-document.addEventListener("mousedown", shoot);
-document.getElementById("restartBtn").addEventListener("click", () => location.reload());
+// Input (only in browser)
+if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+    document.addEventListener("keydown", e => keys[e.code] = true);
+    document.addEventListener("keyup", e => keys[e.code] = false);
+    document.addEventListener("mousedown", shoot);
+    const restartBtn = document.getElementById("restartBtn");
+    if (restartBtn) {
+        restartBtn.addEventListener("click", () => location.reload());
+    }
+}
 
 // =======================
 // GAME FUNCTIONS
@@ -629,13 +656,13 @@ function update() {
                 if (!b.active) continue;
                 if (checkCollision(b,e)){
                     b.active = false;
-                    e.health -= 25;
+                    e.health -= b.damage * player.damage; // Check for Berserk mode
                     if (e.health <= 0) { 
                         score += e.award; 
                         removeEnemy(ei); 
 
                         // Spawn a random collectible at enemy's position
-                        const types = ["health", "ammo", "score", "speed", "ignite", "slowdown"];
+                        const types = ["health", "berserk", "score", "speed", "ignite", "slowdown"];
                         if (Math.random() < 0.2) { // 30% chance to drop
                             let type = null
                             if (player.health < 30){
@@ -662,7 +689,7 @@ function update() {
                 if (checkCollision(b,p))
                 {
                     b.active = false;
-                    p.health -= 25;
+                    p.health -= b.damage * player.damage; // Check for Berserk mode
                     if (p.health <= 0) { 
                         portals.splice(pi, 1); 
                         score += 100; 
@@ -699,7 +726,7 @@ function update() {
                 checkCollision(pBullet,boss)
             ) {
                 pBullet.active = false;
-                boss.health -= 20;
+                boss.health -= pBullet.damage;
 
                 if (boss.health <= 0 && !boss.isDying) {
                     score += 500;
@@ -761,11 +788,13 @@ function gameLoop() {
     if (!gameOver) requestAnimationFrame(gameLoop);
 }
 
-// function endGame() {
-//     gameOver = true;
-//     document.getElementById("finalScore").innerText = score;
-//     document.getElementById("gameOverScreen").style.display = "flex";
-// }
 
-// Start loading assets
-loadAssets();
+// Start loading assets only in browser
+if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+    loadAssets();
+}
+
+// Export classes for Jest testing
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { Player, Enemy, Bullet, Portal, Boss, Collectable };
+}
