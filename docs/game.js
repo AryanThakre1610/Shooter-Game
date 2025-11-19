@@ -30,19 +30,19 @@ function loadImage(src) {
 async function loadAssets() {
     const [images] = await Promise.all([
         Promise.all([
-            loadImage("../assets/img/player.png"),
-            loadImage("../assets/img/enemies/fishMonster.png"),
-            loadImage("../assets/img/enemies/snakeMonster.png"),
-            loadImage("../assets/img/enemies/lizardMonster.png"),
-            loadImage("../assets/img/background.png"),
-            loadImage("../assets/img/enemies/portal.png"),
-            loadImage("../assets/img/enemies/boss.png"),
-            loadImage("../assets/img/collectables/health.png"),
-            loadImage("../assets/img/collectables/berserk.png"),
-            loadImage("../assets/img/collectables/score.png"),
-            loadImage("../assets/img/collectables/speed.png"),
-            loadImage("../assets/img/collectables/ignite.png"),
-            loadImage("../assets/img/collectables/slowdown.png")
+            loadImage("./assets/img/player.png"),
+            loadImage("./assets/img/enemies/fishMonster.png"),
+            loadImage("./assets/img/enemies/snakeMonster.png"),
+            loadImage("./assets/img/enemies/lizardMonster.png"),
+            loadImage("./assets/img/background.png"),
+            loadImage("./assets/img/enemies/portal.png"),
+            loadImage("./assets/img/enemies/boss.png"),
+            loadImage("./assets/img/collectables/health.png"),
+            loadImage("./assets/img/collectables/berserk.png"),
+            loadImage("./assets/img/collectables/score.png"),
+            loadImage("./assets/img/collectables/speed.png"),
+            loadImage("./assets/img/collectables/ignite.png"),
+            loadImage("./assets/img/collectables/slowdown.png")
         ])
     ]);
 
