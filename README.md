@@ -29,12 +29,12 @@ A 2D shooter game built with HTML5 Canvas. Control your hero, defeat waves of en
 - **Enemies:** Multiple types, spawn from portals, unique movement
 - **Boss Fight:** Challenging final boss with special attacks
 - **Collectables:** 
-    - <img src="assets/img/collectables/health.png" alt="Health" width="28" height="28"/> Health 
-    - <img src="assets/img/collectables/score.png" alt="Score" width="28" height="28"/> Score 
-    - <img src="assets/img/collectables/speed.png" alt="Speed" width="28" height="28"/> Speed 
-    - <img src="assets/img/collectables/berserk.png" alt="Berserk" width="28" height="28"/> Berserk 
-    - <img src="assets/img/collectables/ignite.png" alt="Ignite" width="28" height="28"/> Ignite 
-    - <img src="assets/img/collectables/slowdown.png" alt="Slowdown" width="28" height="28"/> Slowdown
+    - <img docs="assets/img/collectables/health.png" alt="Health" width="28" height="28"/> Health 
+    - <img docs="assets/img/collectables/score.png" alt="Score" width="28" height="28"/> Score 
+    - <img docs="assets/img/collectables/speed.png" alt="Speed" width="28" height="28"/> Speed 
+    - <img docs="assets/img/collectables/berserk.png" alt="Berserk" width="28" height="28"/> Berserk 
+    - <img docs="assets/img/collectables/ignite.png" alt="Ignite" width="28" height="28"/> Ignite 
+    - <img docs="assets/img/collectables/slowdown.png" alt="Slowdown" width="28" height="28"/> Slowdown
 - **Health & Score System:** Track your progress and survival
 - **Game Over & Victory Screens:** Clear feedback for win/loss
 - **Responsive Canvas:** Adapts to window size
@@ -75,12 +75,12 @@ A 2D shooter game built with HTML5 Canvas. Control your hero, defeat waves of en
    npm install
    ```
 3. **Run the game:**
-   - Open `src/index.html` in your browser.
+   - Open `docs/index.html` in your browser.
 4. **Run tests:**
    ```bash
    npm test
    ```
-   All core game logic is covered by Jest unit tests in `src/game.test.js`.
+   All core game logic is covered by Jest unit tests in `docs/game.test.js`.
 
 ---
 
