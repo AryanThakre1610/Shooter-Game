@@ -6,17 +6,23 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>ShootERS</h1>
-    <div class="hud">
-        <span>Score: <span id="score">0</span></span>
-        <span>Player Health: <span id="playerHealth">100</span></span>
+
+    <div id="topBar">
+        <h1 class="title">ShootERS</h1>
+        <div class="hud">
+            <span>💰 Score: <span id="score">0</span></span>
+            <span>❤️ HP: <span id="playerHealth">100</span></span>
+        </div>
     </div>
+
     <canvas id="gameCanvas"></canvas>
+
     <div id="gameOverScreen">
         <h2>GAME OVER</h2>
         <p>Your Score: <span id="finalScore">0</span></p>
         <button id="restartBtn">Restart</button>
     </div>
+
     <script src="game.js"></script>
 </body>
 </html>

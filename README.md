@@ -1,4 +1,4 @@
-# Canvas Shooter Game
+# Alien-Shooter Game
 
 A simple 2D shooter game built using the HTML5 Canvas API. The player controls a character, shoots enemies, and tracks score and health. 
 ---
